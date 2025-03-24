@@ -41,13 +41,30 @@ public class User implements Serializable {
 	}
 	
 	public void addFriend(User user) {
-		if (!friends.contains(user)) {
-			friends.add(user);
-		}
+	if (friend == this) {
+            System.out.println("You cannot add yourself as a friend.");
+            return;
+        }
+        if (!friends.contains(friend)) {
+            friends.add(friend);
+            // Ensure mutual friendship by adding the current user to the friend's list.
+            if (!friend.friends.contains(this)) {
+                friend.friends.add(this);
+            }
+            System.out.println(friend.getName() + " has been added as a friend.");
+        } else {
+            System.out.println(friend.getName() + " is already your friend.");
+        }
+    }
 	}
 	
 	public void removeFriend(User user) {
-		friends.remove(user);
+	if (friends.remove(friend)) {
+            friend.friends.remove(this);
+            System.out.println(friend.getName() + " has been removed from your friends list.");
+        } else {
+            System.out.println(friend.getName() + " is not in your friends list.");
+        }
 	}
 	
 	public void sendMessage(User recipient, String content) {
