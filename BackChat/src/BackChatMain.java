@@ -1,8 +1,8 @@
 import java.util.Scanner;
-
+import java.util.InputMismatchException;
 
 public class BackChatMain {
-	private static BackChat backChat = new BackChat();
+    private static BackChat backChat = new BackChat();
 
     public static void main(String[] args) {
         backChat.loadNetworkFromFile();
@@ -15,9 +15,17 @@ public class BackChatMain {
             System.out.println("1. Create New User");
             System.out.println("2. Login");
             System.out.println("3. Exit");
+            System.out.print("Select an option: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();  // Consume newline
+            int choice = -1;
+            try {
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // Consume invalid input
+                continue;
+            }
 
             switch (choice) {
                 case 1:
@@ -61,21 +69,33 @@ public class BackChatMain {
         String userID = scanner.nextLine();
 
         if (backChat.login(userID)) {
-            System.out.println("Login successful!");
+            System.out.println("Login successful! Welcome, " + backChat.getCurrentUser().getName() + "!");
             User currentUser = backChat.getCurrentUser();
 
             boolean isLoggedIn = true;
             while (isLoggedIn) {
+                System.out.println("\n--- Main Menu ---");
                 System.out.println("1. View Profile");
                 System.out.println("2. View Friends");
-                System.out.println("3. Send Message");
-                System.out.println("4. View Messages");
-                System.out.println("5. Logout");
+                System.out.println("3. Add Friend");
+                System.out.println("4. Delete Friend");
+                System.out.println("5. View a Friend's Friends");
+                System.out.println("6. Send Message");
+                System.out.println("7. View Messages");
+                System.out.println("8. Logout");
+                System.out.print("Select an option: ");
 
-                int choice = scanner.nextInt();
-                scanner.nextLine();  // Consume newline
+                int option = -1;
+                try {
+                    option = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a number.");
+                    scanner.nextLine(); // Consume invalid input
+                    continue;
+                }
 
-                switch (choice) {
+                switch (option) {
                     case 1:
                         System.out.println(currentUser);
                         break;
@@ -83,12 +103,21 @@ public class BackChatMain {
                         viewFriends(currentUser);
                         break;
                     case 3:
-                        sendMessage(scanner, currentUser);
+                        addFriend(scanner, currentUser);
                         break;
                     case 4:
-                        currentUser.viewMessages();
+                        backChat.deleteFriend(currentUser);
                         break;
                     case 5:
+                        backChat.viewFriendOfFriend(currentUser);
+                        break;
+                    case 6:
+                        sendMessage(scanner, currentUser);
+                        break;
+                    case 7:
+                        currentUser.viewMessages();
+                        break;
+                    case 8:
                         isLoggedIn = false;
                         System.out.println("Logged out successfully!");
                         break;
@@ -105,16 +134,22 @@ public class BackChatMain {
         if (currentUser.getFriends().isEmpty()) {
             System.out.println("You have no friends yet.");
         } else {
+            System.out.println("Your friends:");
             for (User friend : currentUser.getFriends()) {
                 System.out.println(friend);
             }
         }
     }
 
+    private static void addFriend(Scanner scanner, User currentUser) {
+        System.out.print("Enter the User ID of the friend to add: ");
+        String friendUserId = scanner.nextLine();
+        backChat.addFriendById(currentUser, friendUserId);
+    }
+
     private static void sendMessage(Scanner scanner, User currentUser) {
         System.out.print("Enter the User ID of the recipient: ");
         String recipientID = scanner.nextLine();
-
         User recipient = backChat.findUserByID(recipientID);
         if (recipient != null && !recipient.equals(currentUser)) {
             System.out.print("Enter your message: ");
