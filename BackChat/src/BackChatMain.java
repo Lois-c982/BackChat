@@ -16,7 +16,7 @@ public class BackChatMain {
         
         //main loop for interacting with the user
         while (isRunning) {
-            System.out.println("Welcome to SocialConnect!");
+            System.out.println("Welcome to BackChat!");
             System.out.println("1. Create New User");
             System.out.println("2. Login");
             System.out.println("3. Exit");
