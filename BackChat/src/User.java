@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class User implements Serializable {
-    // Global registry for all users
+    // Global registry for all users, mapping userId to user object
     private static Map<String, User> allUsers = new HashMap<>();
     
     private String userID;
@@ -15,43 +15,44 @@ public class User implements Serializable {
     private String hometown;
     private List<User> friends;
     private List<Message> messages;
-    
+
+    //constructor initalises the user object with all necessary details
     public User(String userID, String name, String birthday, String workplace, String hometown) {
         this.userID = userID;
         this.name = name;
         this.birthday = birthday;
         this.workplace = workplace;
         this.hometown = hometown;
-        this.friends = new ArrayList<>();
-        this.messages = new ArrayList<>();
+        this.friends = new ArrayList<>(); //initialise friends list
+        this.messages = new ArrayList<>(); //initialise messages list
         // Register this user in the global registry
         allUsers.put(userID, this);
     }
-    
+    //getter for userID
     public String getUserID() {
         return userID;
     }
-    
+    //getter for user's name
     public String getName() {
         return name;
     }
-    
+    //getter for user's birthday
     public String getBirthday() {
         return birthday;
     }
-    
+    // getter for user's workplace
     public String getWorkplace() {
         return workplace;
     }
-    
+    //getter for user's hometown
     public String getHometown() {
         return hometown;
     }
-    
+    //getter for user's friend list
     public List<User> getFriends() {
         return friends;
     }
-    
+    //getter for user's messages
     public List<Message> getMessages() {
         return messages;
     }
@@ -122,22 +123,22 @@ public class User implements Serializable {
             }
         }
     }
-    
+    //override for toString method to display user inforamtion in a readable format
     @Override
     public String toString() {
         return "UserID: " + userID + ", Name: " + name + ", Birthday: " + birthday +
                ", Workplace: " + workplace + ", Hometown: " + hometown;
     }
-    
+    //override equals method to compare users by their userID
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) return true; //check if objects are the same
+        if (obj == null || getClass() != obj.getClass()) return false; //ensure the objects are the same type
         
         User other = (User) obj;
-        return userID != null ? userID.equals(other.userID) : other.userID == null;
+        return userID != null ? userID.equals(other.userID) : other.userID == null; 
     }
-    
+    //ovverride for hashCode to generate a hash code based on UserID
     @Override
     public int hashCode() {
         return userID != null ? userID.hashCode() : 0;
