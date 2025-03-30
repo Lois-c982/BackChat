@@ -214,20 +214,30 @@ public class BackChatMain {
         String friendUserId = scanner.nextLine();
         backChat.addFriendById(currentUser, friendUserId); //calls method for adding friend
     }
-    //method for sending a message to a friend
+
     private static void sendMessage(Scanner scanner, User currentUser) {
-        System.out.print("Enter the User ID of the recipient: ");
-        String recipientID = scanner.nextLine();
-        User recipient = backChat.findUserByID(recipientID);
-        if (recipient != null && !recipient.equals(currentUser)) {
-            System.out.print("Enter your message: ");
-            String messageContent = scanner.nextLine();
-            currentUser.sendMessage(recipient, messageContent); //sends the message to recipient
-            currentUser.sendMessage(currentUser, messageContent); //adds message to sender's inbox
-            System.out.println("Message sent!");
-        } else {
-            System.out.println("Invalid recipient or you cannot message yourself.");
-        }
+    System.out.print("Enter the User ID of the recipient: ");
+    String recipientID = scanner.nextLine();
+    User recipient = backChat.findUserByID(recipientID);
+    
+    if (recipient != null && !recipient.equals(currentUser)) {
+        System.out.print("Enter your message: ");
+        String messageContent = scanner.nextLine();
+        
+        // Create a single Message instance
+        Message message = new Message(currentUser.getUserID(), recipient.getUserID(), messageContent);
+        
+        // Add the message to the recipient's inbox
+        recipient.receiveMessage(message);
+        
+        // Also add the same message to the sender's inbox so they can view their sent message
+        currentUser.receiveMessage(message);
+        
+        System.out.println("Message sent!");
+    } else {
+        System.out.println("Invalid recipient or you cannot message yourself.");
     }
+}
+
     
 }
