@@ -8,39 +8,41 @@ import java.util.Set;
 import java.util.InputMismatchException;
 import java.util.List;
 
+//class implementing serializable interface to load and saving user data
 public class BackChat implements Serializable {
     private Map<String, User> users;
     private User currentUser;
     private static Scanner scanner = new Scanner(System.in);
 
+    //constructor to initialise user map
     public BackChat() {
         users = new HashMap<>();
     }
-    
+    //add user to system
     public void addUser(User user) {
         users.put(user.getUserID(), user);
     }
-    
+    //find user using userID
     public User findUserByID(String userID) {
         return users.get(userID);
     }
-    
+    //login user if they exist
     public boolean login(String userID) {
         if (users.containsKey(userID)) {
-            currentUser = users.get(userID);
+            currentUser = users.get(userID); //set the current user
             return true;
         }
         return false;
     }
-    
+    //loads user network from file
     public void loadNetworkFromFile() {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("networkData.ser"))) {
-            users = (Map<String, User>) in.readObject();
+            users = (Map<String, User>) in.readObject(); //deseralise user data
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading data: " + e.getMessage());
+            System.out.println("Error loading data: " + e.getMessage()); //error handling
         }
     }
-    
+    //saves user network to file for persistence
     public void saveNetworkToFile() {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("networkData.ser"))) {
             out.writeObject(users);
@@ -48,7 +50,7 @@ public class BackChat implements Serializable {
             System.out.println("Error saving data: " + e.getMessage());
         }
     }
-    
+    //retrieves currenly logged in user
     public User getCurrentUser() {
         return currentUser;
     }
@@ -168,7 +170,7 @@ public class BackChat implements Serializable {
         } else {
             System.out.println("Recommended friends based on your " + filterType.toLowerCase() + " (" + filterValue + "):");
             for (User recommended : filteredRecommendations) {
-                System.out.println(recommended);
+                System.out.println(recommended); //displaus the filtered recommendations
             }
         }
     }
