@@ -37,9 +37,15 @@ public class BackChat implements Serializable {
     //loads user network from file
     public void loadNetworkFromFile() {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("networkData.ser"))) {
-            users = (Map<String, User>) in.readObject(); //deseralise user data
+            users = (Map<String, User>) in.readObject();
+            // Rebuild the global registry
+            for (User user : users.values()) {
+                // This assumes you have a setter or a method to register the user globally
+                // Alternatively, if your constructor already adds the user, you might need a static method to re-register.
+                User.getAllUsers().put(user.getUserID(), user);
+            }
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading data: " + e.getMessage()); //error handling
+            System.out.println("Error loading data: " + e.getMessage());
         }
     }
     //saves user network to file for persistence

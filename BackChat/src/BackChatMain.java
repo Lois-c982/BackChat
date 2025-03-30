@@ -222,7 +222,8 @@ public class BackChatMain {
         if (recipient != null && !recipient.equals(currentUser)) {
             System.out.print("Enter your message: ");
             String messageContent = scanner.nextLine();
-            currentUser.sendMessage(recipient, messageContent); //sends the message
+            currentUser.sendMessage(recipient, messageContent); //sends the message to recipient
+            currentUser.sendMessage(currentUser, messageContent); //adds message to sender's inbox
             System.out.println("Message sent!");
         } else {
             System.out.println("Invalid recipient or you cannot message yourself.");

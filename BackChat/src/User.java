@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class User implements Serializable {
+    private static final long serialVersionUID = 1L;  // Added serialVersionUID
     // Global registry for all users, mapping userId to user object
     private static Map<String, User> allUsers = new HashMap<>();
     
@@ -55,6 +56,10 @@ public class User implements Serializable {
     //getter for user's messages
     public List<Message> getMessages() {
         return messages;
+    }
+    //getter for allUsers
+    public static Map<String, User> getAllUsers() {
+        return allUsers;
     }
     
     // Lookup a user by userID using the global registry.
@@ -143,5 +148,6 @@ public class User implements Serializable {
     public int hashCode() {
         return userID != null ? userID.hashCode() : 0;
     }
+   
 
 }
