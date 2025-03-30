@@ -142,4 +142,5 @@ public class User implements Serializable {
     public int hashCode() {
         return userID != null ? userID.hashCode() : 0;
     }
+
 }

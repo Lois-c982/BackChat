@@ -1,5 +1,8 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.InputMismatchException;
+import java.util.List;
 
 public class BackChatMain {
     private static BackChat backChat = new BackChat();
@@ -48,8 +51,20 @@ public class BackChatMain {
     }
 
     private static void createUser(Scanner scanner) {
-        System.out.print("Enter User ID: ");
-        String userID = scanner.nextLine();
+        String userID;
+        
+        // Ensure the user ID is unique
+        while (true) {
+            System.out.print("Enter User ID: ");
+            userID = scanner.nextLine().trim();
+            
+            if (backChat.findUserByID(userID) != null) {
+                System.out.println("User ID already exists. Please choose a different one.");
+            } else {
+                break; // Exit the loop if the userID is unique
+            }
+        }
+    
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
         System.out.print("Enter Birthday (yyyy-mm-dd): ");
@@ -58,11 +73,12 @@ public class BackChatMain {
         String workplace = scanner.nextLine();
         System.out.print("Enter Hometown: ");
         String hometown = scanner.nextLine();
-
+    
         User newUser = new User(userID, name, birthday, workplace, hometown);
         backChat.addUser(newUser);
         System.out.println("User created successfully!");
     }
+    
 
     private static void login(Scanner scanner) {
         System.out.print("Enter User ID: ");
@@ -83,6 +99,7 @@ public class BackChatMain {
                 System.out.println("6. Send Message");
                 System.out.println("7. View Messages");
                 System.out.println("8. Logout");
+                System.out.println("9. Friend Recommendations");
                 System.out.print("Select an option: ");
 
                 int option = -1;
@@ -121,6 +138,9 @@ public class BackChatMain {
                         isLoggedIn = false;
                         System.out.println("Logged out successfully!");
                         break;
+                    case 9:
+                        backChat.recommendFriends(currentUser);
+                        break;
                     default:
                         System.out.println("Invalid choice, please try again.");
                 }
@@ -131,12 +151,55 @@ public class BackChatMain {
     }
 
     private static void viewFriends(User currentUser) {
-        if (currentUser.getFriends().isEmpty()) {
-            System.out.println("You have no friends yet.");
-        } else {
-            System.out.println("Your friends:");
-            for (User friend : currentUser.getFriends()) {
-                System.out.println(friend);
+    Scanner scanner = new Scanner(System.in);
+
+    if (currentUser.getFriends().isEmpty()) {
+        System.out.println("You have no friends yet.");
+        return;
+    }
+
+    System.out.println("Filter by:");
+    System.out.println("1. Show all friends (sorted A-Z)");
+    System.out.println("2. Filter by hometown");
+    System.out.println("3. Filter by workplace");
+    System.out.print("Select an option: ");
+
+    int filterOption = -1;
+    try {
+        filterOption = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+    } catch (InputMismatchException e) {
+        System.out.println("Invalid input. Please enter a number.");
+        scanner.nextLine(); // Consume invalid input
+        return;
+    }
+
+    List<User> filteredFriends = new ArrayList<>(currentUser.getFriends());
+
+    switch (filterOption) {
+        case 1:
+            filteredFriends.sort(Comparator.comparing(User::getName, String.CASE_INSENSITIVE_ORDER));
+            break;
+        case 2:
+            System.out.print("Enter hometown to filter by: ");
+            String hometown = scanner.nextLine();
+            filteredFriends.removeIf(friend -> !friend.getHometown().equalsIgnoreCase(hometown));
+            break;
+        case 3:
+            System.out.print("Enter workplace to filter by: ");
+            String workplace = scanner.nextLine();
+            filteredFriends.removeIf(friend -> !friend.getWorkplace().equalsIgnoreCase(workplace));
+            break;
+        default:
+            System.out.println("Invalid option. Showing all friends.");
+    }
+
+    if (filteredFriends.isEmpty()) {
+        System.out.println("No friends matched your filter.");
+    } else {
+        System.out.println("Your friends:");
+        for (User friend : filteredFriends) {
+            System.out.println(friend);
             }
         }
     }
@@ -160,4 +223,5 @@ public class BackChatMain {
             System.out.println("Invalid recipient or you cannot message yourself.");
         }
     }
+    
 }

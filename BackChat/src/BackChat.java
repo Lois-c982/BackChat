@@ -1,8 +1,12 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.InputMismatchException;
+import java.util.List;
 
 public class BackChat implements Serializable {
     private Map<String, User> users;
@@ -97,8 +101,77 @@ public class BackChat implements Serializable {
             return;
         }
         System.out.println(friend.getName() + "'s friends: ");
-        for (User f : friend.getFriends()) {
-            System.out.println(f.getName());
+        List<User> friendList = friend.getFriends();
+        
+        if (friendList.isEmpty()) {
+            System.out.println(friend.getName() + " has no friends.");
+            return;
+        }
+        
+        for (User f : friendList) {
+            System.out.print(f.getName());
+            
+            // Check if the current user is also friends with this person
+            if (currentUser.getFriends().contains(f)) {
+                System.out.println(" (Mutual Friend)");
+            } else {
+                System.out.println();
+            }
         }
     }
+
+    public void recommendFriends(User currentUser) {
+        Set<User> potentialFriends = new HashSet<>();
+    
+        // Gather friends of friends (excluding existing friends and the user)
+        for (User friend : currentUser.getFriends()) {
+            for (User friendOfFriend : friend.getFriends()) {
+                if (!currentUser.getFriends().contains(friendOfFriend) && !friendOfFriend.equals(currentUser)) {
+                    potentialFriends.add(friendOfFriend);
+                }
+            }
+        }
+    
+        if (potentialFriends.isEmpty()) {
+            System.out.println("No friend recommendations available at this time.");
+            return;
+        }
+    
+        // Let the user choose between filtering by hometown or workplace
+        System.out.println("Filter recommendations by:");
+        System.out.println("1. Hometown");
+        System.out.println("2. Workplace");
+        System.out.print("Enter your choice: ");
+    
+        int choice;
+        try {
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter 1 or 2.");
+            scanner.nextLine(); // Consume invalid input
+            return;
+        }
+    
+        String filterValue = (choice == 1) ? currentUser.getHometown() : currentUser.getWorkplace();
+        String filterType = (choice == 1) ? "Hometown" : "Workplace";
+    
+        // Filter recommendations based on the selected criteria
+        List<User> filteredRecommendations = new ArrayList<>(potentialFriends);
+        filteredRecommendations.removeIf(user -> 
+            choice == 1 ? !user.getHometown().equalsIgnoreCase(filterValue) 
+                        : !user.getWorkplace().equalsIgnoreCase(filterValue)
+        );
+    
+        if (filteredRecommendations.isEmpty()) {
+            System.out.println("No recommended friends match your " + filterType.toLowerCase() + " (" + filterValue + ").");
+        } else {
+            System.out.println("Recommended friends based on your " + filterType.toLowerCase() + " (" + filterValue + "):");
+            for (User recommended : filteredRecommendations) {
+                System.out.println(recommended);
+            }
+        }
+    }
+    
+
 }
