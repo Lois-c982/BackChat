@@ -8,11 +8,13 @@ public class BackChatMain {
     private static BackChat backChat = new BackChat();
 
     public static void main(String[] args) {
+        //load network data from file
         backChat.loadNetworkFromFile();
 
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
-
+        
+        //main loop for interacting with the user
         while (isRunning) {
             System.out.println("Welcome to SocialConnect!");
             System.out.println("1. Create New User");
@@ -32,14 +34,14 @@ public class BackChatMain {
 
             switch (choice) {
                 case 1:
-                    createUser(scanner);
+                    createUser(scanner); //create a new user
                     break;
                 case 2:
-                    login(scanner);
+                    login(scanner); //login for an existing user
                     break;
                 case 3:
                     isRunning = false;
-                    backChat.saveNetworkToFile();
+                    backChat.saveNetworkToFile(); //exit program and save network data to file
                     System.out.println("Goodbye!");
                     break;
                 default:
@@ -49,7 +51,7 @@ public class BackChatMain {
 
         scanner.close();
     }
-
+    //method to create new user
     private static void createUser(Scanner scanner) {
         String userID;
         
@@ -64,7 +66,7 @@ public class BackChatMain {
                 break; // Exit the loop if the userID is unique
             }
         }
-    
+        //get other details from user
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
         System.out.print("Enter Birthday (yyyy-mm-dd): ");
@@ -73,13 +75,13 @@ public class BackChatMain {
         String workplace = scanner.nextLine();
         System.out.print("Enter Hometown: ");
         String hometown = scanner.nextLine();
-    
+        //creates the new user object then add to network
         User newUser = new User(userID, name, birthday, workplace, hometown);
         backChat.addUser(newUser);
         System.out.println("User created successfully!");
     }
     
-
+    //login method for existing user
     private static void login(Scanner scanner) {
         System.out.print("Enter User ID: ");
         String userID = scanner.nextLine();
@@ -88,6 +90,7 @@ public class BackChatMain {
             System.out.println("Login successful! Welcome, " + backChat.getCurrentUser().getName() + "!");
             User currentUser = backChat.getCurrentUser();
 
+            //loop for main menu of a logged in user
             boolean isLoggedIn = true;
             while (isLoggedIn) {
                 System.out.println("\n--- Main Menu ---");
@@ -114,32 +117,32 @@ public class BackChatMain {
 
                 switch (option) {
                     case 1:
-                        System.out.println(currentUser);
+                        System.out.println(currentUser); //display user's profile
                         break;
                     case 2:
-                        viewFriends(currentUser);
+                        viewFriends(currentUser); //view users friends
                         break;
                     case 3:
-                        addFriend(scanner, currentUser);
+                        addFriend(scanner, currentUser); //add new friend
                         break;
                     case 4:
-                        backChat.deleteFriend(currentUser);
+                        backChat.deleteFriend(currentUser); //delete a friend
                         break;
                     case 5:
-                        backChat.viewFriendOfFriend(currentUser);
+                        backChat.viewFriendOfFriend(currentUser); //view user's friend's friends
                         break;
                     case 6:
-                        sendMessage(scanner, currentUser);
+                        sendMessage(scanner, currentUser); //send message to a friend
                         break;
                     case 7:
-                        currentUser.viewMessages();
+                        currentUser.viewMessages();//view received messages of the user
                         break;
                     case 8:
-                        isLoggedIn = false;
+                        isLoggedIn = false; // logs out user
                         System.out.println("Logged out successfully!");
                         break;
                     case 9:
-                        backChat.recommendFriends(currentUser);
+                        backChat.recommendFriends(currentUser); //friend recommendation for user's based on mutuals
                         break;
                     default:
                         System.out.println("Invalid choice, please try again.");
@@ -149,15 +152,16 @@ public class BackChatMain {
             System.out.println("Invalid User ID!");
         }
     }
-
+    //method for viewing current user's friends using filtering options
     private static void viewFriends(User currentUser) {
     Scanner scanner = new Scanner(System.in);
 
+    //check if user has any friends
     if (currentUser.getFriends().isEmpty()) {
         System.out.println("You have no friends yet.");
         return;
     }
-
+    //display filtering options to user
     System.out.println("Filter by:");
     System.out.println("1. Show all friends (sorted A-Z)");
     System.out.println("2. Filter by hometown");
@@ -175,25 +179,26 @@ public class BackChatMain {
     }
 
     List<User> filteredFriends = new ArrayList<>(currentUser.getFriends());
-
+    //apply user selected by user
     switch (filterOption) {
         case 1:
-            filteredFriends.sort(Comparator.comparing(User::getName, String.CASE_INSENSITIVE_ORDER));
+            filteredFriends.sort(Comparator.comparing(User::getName, String.CASE_INSENSITIVE_ORDER)); //sort friends by name
             break;
         case 2:
             System.out.print("Enter hometown to filter by: ");
             String hometown = scanner.nextLine();
-            filteredFriends.removeIf(friend -> !friend.getHometown().equalsIgnoreCase(hometown));
+            filteredFriends.removeIf(friend -> !friend.getHometown().equalsIgnoreCase(hometown)); //filter by hometown
             break;
         case 3:
             System.out.print("Enter workplace to filter by: ");
             String workplace = scanner.nextLine();
-            filteredFriends.removeIf(friend -> !friend.getWorkplace().equalsIgnoreCase(workplace));
+            filteredFriends.removeIf(friend -> !friend.getWorkplace().equalsIgnoreCase(workplace)); //filter by workplace
             break;
         default:
             System.out.println("Invalid option. Showing all friends.");
     }
 
+    //display filtered friends list
     if (filteredFriends.isEmpty()) {
         System.out.println("No friends matched your filter.");
     } else {
@@ -203,13 +208,13 @@ public class BackChatMain {
             }
         }
     }
-
+    //method to add new friends to user's friend list
     private static void addFriend(Scanner scanner, User currentUser) {
         System.out.print("Enter the User ID of the friend to add: ");
         String friendUserId = scanner.nextLine();
-        backChat.addFriendById(currentUser, friendUserId);
+        backChat.addFriendById(currentUser, friendUserId); //calls method for adding friend
     }
-
+    //method for sending a message to a friend
     private static void sendMessage(Scanner scanner, User currentUser) {
         System.out.print("Enter the User ID of the recipient: ");
         String recipientID = scanner.nextLine();
@@ -217,7 +222,7 @@ public class BackChatMain {
         if (recipient != null && !recipient.equals(currentUser)) {
             System.out.print("Enter your message: ");
             String messageContent = scanner.nextLine();
-            currentUser.sendMessage(recipient, messageContent);
+            currentUser.sendMessage(recipient, messageContent); //sends the message
             System.out.println("Message sent!");
         } else {
             System.out.println("Invalid recipient or you cannot message yourself.");
